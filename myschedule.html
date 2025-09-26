@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Schedule | PetCare</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --background-color: #f0f2f5;
+            --card-background: #fff;
+            --text-color: #333;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: var(--card-background);
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        #logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 1.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .day-header {
+            font-weight: bold;
+            color: var(--primary-color);
+            padding-bottom: 5px;
+        }
+
+        .day-cell {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 1rem 0.5rem;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            position: relative;
+        }
+        
+        .day-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .day-cell.today {
+            border: 2px solid var(--primary-color);
+        }
+
+        .appointment-label {
+            background-color: #3498db;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            text-align: left;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        .appointment-label.checkup {
+            background-color: var(--primary-color);
+        }
+        
+        .appointment-label.consultation {
+            background-color: #f39c12;
+        }
+        
+        .appointment-label.busy {
+            background-color: #95a5a6;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .navbar nav {
+                margin-top: 1rem;
+            }
+
+            .navbar nav a, #logout-btn {
+                margin: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">PetCare</div>
+        <nav>
+            <a href="vet-dashboard.html">Dashboard</a>
+            <a href="my-schedule.html">My Schedule</a>
+            <a href="client.html">Clients</a>
+            <button id="logout-btn">Logout</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>My Schedule</h1>
+        <div class="card">
+            <div class="calendar-header">
+                <button id="prev-month">&lt;</button>
+                <h2 id="current-month">October 2025</h2>
+                <button id="next-month">&gt;</button>
+            </div>
+            
+            <div class="calendar-grid" id="calendar-grid">
+                <div class="day-header">Sun</div>
+                <div class="day-header">Mon</div>
+                <div class="day-header">Tue</div>
+                <div class="day-header">Wed</div>
+                <div class="day-header">Thu</div>
+                <div class="day-header">Fri</div>
+                <div class="day-header">Sat</div>
+                
+                </div>
+            
+        </div>
+    </main>
+
+    <script>
+        // NOTE: HARDCODED_APPOINTMENTS ARRAY REMOVED AS REQUESTED.
+        // The calendar will now only display appointments saved by Pet Owners.
+
+        /**
+         * Loads pet check-up submissions from localStorage and converts them 
+         * into scheduled appointment objects.
+         * @returns {Array} List of dynamically created appointment objects.
+         */
+        function getPetOwnerAppointments() {
+            try {
+                const pets = JSON.parse(localStorage.getItem('pets')) || [];
+                return pets.map(pet => ({
+                    date: pet.checkupDate,
+                    // Use checkupTime if present (assuming form modification), fallback to default
+                    time: pet.checkupTime || '10:00 AM', 
+                    pet: pet.name,
+                    type: 'Pet Check-up',
+                    class: 'checkup'
+                }));
+            } catch (error) {
+                console.error("Error loading pets from localStorage:", error);
+                return [];
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Authorization Check ---
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const userType = localStorage.getItem('userType');
+
+            if (isLoggedIn !== 'true' || userType !== 'vet') {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // --- Appointment Data ---
+            // ALL_APPOINTMENTS now consists ONLY of data from the pet check-up form
+            const ALL_APPOINTMENTS = getPetOwnerAppointments();
+            
+            // --- Logout Logic ---
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            });
+            
+            // --- Calendar Logic ---
+            const calendarGridContainer = document.getElementById('calendar-grid');
+            const currentMonthHeader = document.getElementById('current-month');
+            const today = new Date();
+            
+            // Start the display at October 2025 (Month Index 9) for initial viewing of sample data
+            let currentDisplayDate = new Date(2025, 9, 1); 
+
+            function renderCalendar() {
+                // Remove only the dynamic day-cell elements (excluding the day headers)
+                let existingCells = calendarGridContainer.querySelectorAll('.day-cell');
+                existingCells.forEach(cell => cell.remove());
+                
+                const year = currentDisplayDate.getFullYear();
+                const month = currentDisplayDate.getMonth();
+                const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 = Sunday, 1 = Monday, etc.
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                
+                currentMonthHeader.textContent = currentDisplayDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+                // Add blank cells for the days before the 1st
+                for (let i = 0; i < firstDayOfMonth; i++) {
+                    const blankCell = document.createElement('div');
+                    blankCell.className = 'day-cell';
+                    calendarGridContainer.appendChild(blankCell);
+                }
+
+                // Add day cells
+                for (let day = 1; day <= daysInMonth; day++) {
+                    // Create the date string in YYYY-MM-DD format for lookup
+                    const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const cell = document.createElement('div');
+                    cell.className = 'day-cell';
+                    
+                    // Check if it's today
+                    const isToday = (
+                        year === today.getFullYear() && 
+                        month === today.getMonth() && 
+                        day === today.getDate() && 
+                        currentDisplayDate.getMonth() === today.getMonth()
+                    );
+
+                    if (isToday) {
+                        cell.classList.add('today');
+                    }
+                    
+                    cell.innerHTML = `<span class="day-number">${day}</span>`;
+                    
+                    // Add appointments for this day from the dynamic list
+                    ALL_APPOINTMENTS.filter(app => app.date === dateString)
+                        .forEach(app => {
+                            const apptLabel = document.createElement('span');
+                            apptLabel.className = `appointment-label ${app.class}`;
+                            apptLabel.title = `${app.pet} - ${app.type} at ${app.time}`;
+                            
+                            // Display logic: show the time and pet name
+                            const displayTime = app.time.split(' ')[0];
+                            apptLabel.textContent = `${displayTime} - ${app.pet}`; 
+                            
+                            cell.appendChild(apptLabel);
+                        });
+
+                    calendarGridContainer.appendChild(cell);
+                }
+            }
+            
+            // Navigation functions
+            document.getElementById('prev-month').addEventListener('click', () => {
+                currentDisplayDate.setMonth(currentDisplayDate.getMonth() - 1);
+                renderCalendar();
+            });
+
+            document.getElementById('next-month').addEventListener('click', () => {
+                currentDisplayDate.setMonth(currentDisplayDate.getMonth() + 1);
+                renderCalendar();
+            });
+
+            // Initial render
+            renderCalendar();
+        });
+    </script>
+</body>
+</html>

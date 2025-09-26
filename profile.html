@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | PetCare</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #8BC34A;
+            --background-color: #f0f2f5;
+            --card-background: #fff;
+            --text-color: #333;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: var(--card-background);
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        .navbar nav a:hover {
+            color: var(--primary-color);
+        }
+
+        #logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 1.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .profile-details, .pet-profiles-container {
+            flex: 1;
+        }
+        
+        /* Styles for the dynamic pet cards and photo */
+        .pet-card {
+            display: flex; /* Enable flexbox for card content */
+            gap: 1rem;
+            align-items: center;
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .pet-photo {
+            width: 70px;
+            height: 70px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0; /* Prevent photo from shrinking */
+        }
+        
+        .pet-info {
+            flex-grow: 1;
+        }
+
+        .pet-card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 0.25rem;
+        }
+        
+        .pet-card p {
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        .pet-card button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.3s;
+        }
+        
+        .pet-card button:hover {
+            background-color: #45a049;
+        }
+        
+        .add-pet-link {
+            display: block; 
+            text-align: center; 
+            margin-top: 1rem; 
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .navbar nav {
+                margin-top: 1rem;
+            }
+
+            .navbar nav a, #logout-btn {
+                margin: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">PetCare</div>
+        <nav>
+            <a href="pet-owner-dashboard.html">Dashboard</a>
+            <a href="appointments.html">Appointments</a>
+            <a href="resources.html">Resources</a>
+            <a href="profile.html">Profile</a>
+            <a href="pet-checkup-form.html">Pet Checkup Form</a>
+            <button id="logout-btn">Logout</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Your Profile</h1>
+        <div class="profile-section">
+            <div class="card profile-details">
+                <h2>Personal Information</h2>
+                <p><strong>Name:</strong> Pet Owner</p>
+                <p><strong>Email:</strong> petowner@example.com</p>
+                <p><strong>Phone:</strong> (123) 456-7890</p>
+                <button>Edit Info</button>
+            </div>
+            
+            <div class="card pet-profiles-container">
+                <h2>Your Pets</h2>
+                <div id="pet-list">
+                    <p style="color: #777;">Loading pet profiles...</p>
+                </div>
+                <a href="pet-checkup-form.html" class="add-pet-link">+ Add New Pet</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutBtn = document.getElementById('logout-btn');
+            logoutBtn.addEventListener('click', () => {
+                // Clear all data and redirect (Simulates a full logout)
+                localStorage.clear();
+                window.location.href = 'index.html'; 
+            });
+            
+            const petListContainer = document.getElementById('pet-list');
+            
+            function renderPetProfiles() {
+                // 1. Get pet data from localStorage (The data saved by pet-checkup-form.html)
+                const pets = JSON.parse(localStorage.getItem('pets')) || [];
+                
+                // 2. Clear the container before re-rendering
+                petListContainer.innerHTML = '';
+                
+                if (pets.length === 0) {
+                    petListContainer.innerHTML = `
+                        <p style="color: #777;">You haven't added any pets yet. Please use the form above to add your first pet!</p>
+                    `;
+                    return;
+                }
+                
+                // 3. Create HTML card for each pet
+                pets.forEach(pet => {
+                    // Get the first letter of the pet's name for the "photo" placeholder
+                    const initial = pet.name.charAt(0).toUpperCase();
+                    
+                    const petCardHtml = `
+                        <div class="pet-card">
+                            <div class="pet-photo">${initial}</div>
+                            <div class="pet-info">
+                                <h3>${pet.name}</h3>
+                                <p><strong>Species:</strong> ${pet.species}</p>
+                                <p><strong>Breed:</strong> ${pet.breed}</p>
+                                <p><strong>Age:</strong> ${pet.age} years</p>
+                                <p style="margin-top: 5px;">* Last Check-up: ${pet.checkupDate}</p>
+                            </div>
+                            <button onclick="viewCheckupDetails('${pet.id}')">View Check-up</button>
+                        </div>
+                    `;
+                    petListContainer.insertAdjacentHTML('beforeend', petCardHtml);
+                });
+            }
+            
+            // Function to handle the "View Check-up" button click (for demonstration)
+            window.viewCheckupDetails = function(petId) {
+                const pets = JSON.parse(localStorage.getItem('pets')) || [];
+                // petId from localStorage is a string, so compare as string
+                const pet = pets.find(p => p.id == petId); 
+                
+               if (pet) {
+        // CORRECTED: Using a single template literal (backticks) for the entire multi-line message.
+        alert(
+            `** Pet Check-up Details for ${pet.name} **
+            
+Date: ${pet.checkupDate}
+Veterinarian: ${pet.vetName || 'N/A'}
+
+Summary: ${pet.checkupNotes}`
+        );
+    }
+};
+
+// Initial call to display the pets when the page loads
+renderPetProfiles();
+        });
+    </script>
+</body>
+</html>

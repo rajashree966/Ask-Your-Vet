@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Owner Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #8BC34A;
+            --background-color: #f0f2f5;
+            --card-background: #fff;
+            --text-color: #333;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: var(--card-background);
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        .navbar nav a:hover {
+            color: var(--primary-color);
+        }
+
+        #logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 1.5rem;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-info h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .pet-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: flex-start; /* Changed to start for better flow */
+            margin-bottom: 2rem;
+        }
+
+        .pet-card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            text-align: left; /* Changed to left for details */
+            min-width: 250px;
+            max-width: 350px;
+            flex: 1;
+        }
+        
+        .pet-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .pet-card p {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 0.1rem;
+        }
+
+        .pet-card .last-checkup {
+             margin-top: 0.5rem;
+             padding-top: 0.5rem;
+             border-top: 1px solid #eee;
+             font-size: 0.8rem;
+             color: #777;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .action-btn {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        
+        .action-btn .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .navbar nav {
+                margin-top: 1rem;
+            }
+
+            .navbar nav a, #logout-btn {
+                margin: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">PetCare</div>
+        <nav>
+            <a href="pet-dashboard.html">Dashboard</a>
+            <a href="appointments.html">Appointments</a>
+            <a href="resources.html">Resources</a>
+            <a href="profile.html">Profile</a>
+            <a href="pet-checkup-form.html">Pet Checkup Form</a>
+            <button id="logout-btn">Logout</button>
+        </nav>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="user-info">
+            <h1>Welcome back, <span id="username">Pet Owner!</span> 👋</h1>
+            <p>Here's a quick overview of your pets and their health.</p>
+        </section>
+
+        <section class="pet-profiles">
+            <h2>Your Pets 🐾</h2>
+            <div class="pet-cards" id="pet-cards-container">
+                <p id="no-pets-message">No pets registered yet. Add your first pet!</p>
+            </div>
+        </section>
+
+       
+
+        <section class="quick-actions">
+            <h2>Quick Actions</h2>
+            <a href="pet-checkup-form.html" class="action-btn"> 
+                <span class="icon">➕</span>
+                <span>Add Pet & Checkup</span>
+            </a>
+            <a href="appointments.html" class="action-btn">
+                <span class="icon">🗓️</span>
+                <span>Book Appointment</span>
+            </a>
+            <a href="resources.html" class="action-btn">
+                <span class="icon">📚</span>
+                <span>Pet Health Library</span>
+            </a>
+            <a href="profile.html" class="action-btn">
+                <span class="icon">👤</span>
+                <span>Edit Profile</span>
+            </a>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Authorization Check (from previous prompt's initial setup) ---
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const userType = localStorage.getItem('userType');
+
+            // NOTE: The restriction was removed in the previous prompt, but the 
+            // values are still used for personalization.
+            // if (isLoggedIn !== 'true' || userType !== 'petOwner') {
+            //     // In a real app, you would redirect here if authorization is needed
+            //     // window.location.href = 'index.html';
+            //     // return;
+            // }
+
+            // --- Personalize Dashboard ---
+            const userName = localStorage.getItem('userName') || 'Pet Owner';
+            document.getElementById('username').textContent = userName;
+
+            // --- Logout Logic ---
+            const logoutBtn = document.getElementById('logout-btn');
+            logoutBtn.addEventListener('click', () => {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            });
+
+            // --- Pet Data Loading and Display ---
+            const pets = JSON.parse(localStorage.getItem('pets')) || [];
+            const container = document.getElementById('pet-cards-container');
+            const noPetsMessage = document.getElementById('no-pets-message');
+            
+            if (pets.length > 0) {
+                noPetsMessage.style.display = 'none';
+                container.innerHTML = ''; // Clear the placeholder
+                
+                pets.forEach(pet => {
+                    const card = document.createElement('div');
+                    card.className = 'pet-card';
+                    card.innerHTML = `
+                        <h3>${pet.name}</h3>
+                        <p><strong>Species:</strong> ${pet.species} (${pet.breed})</p>
+                        <p><strong>Age:</strong> ${pet.age}</p>
+                        <div class="last-checkup">
+                            <strong>Last Checkup:</strong> ${pet.checkupDate || 'N/A'}
+                            <br>
+                            <strong>Notes:</strong> ${pet.checkupNotes.substring(0, 50)}${pet.checkupNotes.length > 50 ? '...' : ''}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } else {
+                noPetsMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

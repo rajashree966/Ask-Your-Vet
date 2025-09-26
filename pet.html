@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Owner Registration</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --background-color: #f0f2f5;
+            --card-background: #fff;
+            --text-color: #333;
+            --border-color: #ddd;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .registration-container {
+            width: 100%;
+            max-width: 450px;
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #777;
+            margin-bottom: 2rem;
+        }
+
+        .registration-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .registration-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .registration-btn:hover {
+            background-color: #45a049;
+        }
+
+        .login-link {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .confirmation-message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 5px;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <h1>Pet Owner Registration</h1>
+        <p>Create an account to manage your pets and connect with vets.</p>
+
+        <form id="owner-registration-form" class="registration-form">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" required>
+            </div>
+            <button type="submit" class="registration-btn">Sign Up</button>
+        </form>
+
+        <div id="confirmation-message" class="confirmation-message">
+            Registration successful! Welcome to the platform.
+        </div>
+
+        <div class="login-link">
+            Already have an account? <a href="index.html">Login here</a>
+        </div>
+    </div>
+<script>
+document.getElementById('owner-registration-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    if (password !== confirmPassword) {
+        alert('Passwords do not match.');
+        return;
+    }
+
+    // --- START LOCAL STORAGE SIMULATION ---
+    
+    const users = JSON.parse(localStorage.getItem('users')) || {};
+
+    if (users.hasOwnProperty(email)) {
+        alert('This email is already registered. Please log in.');
+        return;
+    }
+    
+    // Save user data to localStorage
+    users[email] = {
+        name: name,
+        password: password,
+        userType: 'petOwner'
+    };
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Set session state
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userType', 'petOwner');
+    localStorage.setItem('userName', name); 
+
+    // Redirect
+    document.getElementById('confirmation-message').textContent = 'Registration successful! Redirecting to pet dashboard...';
+    document.getElementById('confirmation-message').style.display = 'block';
+
+    setTimeout(() => {
+        // Redirect to the dashboard
+        window.location.href = 'pet-dashboard.html';
+    }, 1000);
+    // -------------------------
+});
+</script>
+</body>
+</html>

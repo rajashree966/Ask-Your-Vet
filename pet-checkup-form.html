@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Pet & Checkup</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --background-color: #f0f2f5;
+            --card-background: #fff;
+            --text-color: #333;
+            --border-color: #ddd;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: #777;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .checkup-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .checkup-form .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 1.5rem;
+            text-align: center;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Add Pet & Check-up Details</h1>
+        <p class="subtitle">Enter your pet's information and their latest check-up report.</p>
+
+        <form id="pet-checkup-form" class="checkup-form">
+            <div class="full-width"><h2>Pet Information</h2></div>
+            <div class="form-group">
+                <label for="pet-name">Pet Name</label>
+                <input type="text" id="pet-name" required>
+            </div>
+            <div class="form-group">
+                <label for="pet-species">Species</label>
+                <select id="pet-species" required>
+                    <option value="">Select Species</option>
+                    <option value="Dog">Dog</option>
+                    <option value="Cat">Cat</option>
+                    <option value="Bird">Bird</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="pet-breed">Breed</label>
+                <input type="text" id="pet-breed" placeholder="e.g., Golden Retriever, Siamese" required>
+            </div>
+            <div class="form-group">
+                <label for="pet-age">Age (in years)</label>
+                <input type="number" id="pet-age" min="0" required>
+            </div>
+
+            <div class="full-width"><h2>Latest Check-up</h2></div>
+            <div class="form-group">
+                <label for="checkup-date">Date of Check-up</label>
+                <input type="date" id="checkup-date" required>
+            </div>
+            <div class="form-group">
+                <label for="vet-name">Veterinarian Name</label>
+                <input type="text" id="vet-name" placeholder="Optional">
+            </div>
+            <div class="form-group full-width">
+                <label for="checkup-notes">Check-up Notes / Summary</label>
+                <textarea id="checkup-notes" placeholder="e.g., Vaccinations given, minor issues, diet recommendations" required></textarea>
+            </div>
+            
+            <div class="full-width">
+                 <button type="submit" class="submit-btn">Save Pet & Update Dashboard</button>
+            </div>
+           
+        </form>
+        <a href="pet-dashboard.html" class="back-link">← Back to Dashboard</a>
+    </div>
+
+    <script>
+        document.getElementById('pet-checkup-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // 1. Collect form data
+    const petData = {
+        id: Date.now(),
+        name: document.getElementById('pet-name').value,
+        species: document.getElementById('pet-species').value,
+        breed: document.getElementById('pet-breed').value,
+        age: document.getElementById('pet-age').value,
+        
+        checkupDate: document.getElementById('checkup-date').value,
+        // *** CRITICAL FIX: Ensure a time is saved. ***
+        // If you haven't added an input field for time yet, use a default:
+        checkupTime: '10:00 AM', // Using the default time defined in my-schedule.html
+        
+        vetName: document.getElementById('vet-name').value,
+        checkupNotes: document.getElementById('checkup-notes').value,
+    };
+
+    // 2. Load existing pets from localStorage
+    const existingPets = JSON.parse(localStorage.getItem('pets')) || [];
+
+    // 3. Add new pet data
+    existingPets.push(petData);
+
+    // 4. Save updated list back to localStorage
+    localStorage.setItem('pets', JSON.stringify(existingPets));
+
+    console.log('Pet details saved:', petData);
+
+    // 5. Redirect to dashboard
+    alert('Pet details saved successfully!');
+    window.location.href = 'pet-dashboard.html';
+});
+    </script>
+    
+</body>
+</html>

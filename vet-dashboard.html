@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vet Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --background-color: #f0f2f5;
+            --card-background: #fff;
+            --text-color: #333;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: var(--card-background);
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        #logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 1.5rem;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-info h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        /* New styling for the full-width pet history card */
+        .full-width-card {
+            grid-column: 1 / -1; /* Makes the card span all columns */
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .card h2 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        .pet-history-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .pet-history-item h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .pet-history-item p {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pet-history-item .note {
+            font-style: italic;
+            color: #777;
+            border-left: 3px solid #ccc;
+            padding-left: 10px;
+        }
+        
+        .button {
+             display: inline-block;
+             padding: 0.5rem 1rem;
+             background-color: var(--primary-color);
+             color: white;
+             text-decoration: none;
+             border-radius: 5px;
+             margin-top: 1rem;
+             transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #388e3c;
+        }
+
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .navbar nav {
+                margin-top: 1rem;
+            }
+
+            .navbar nav a, #logout-btn {
+                margin: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">PetCare</div>
+        <nav>
+            <a href="vet-dashboard.html">Dashboard</a>
+            <a href="myschedule.html">My Schedule</a>
+            <a href="client.html">Clients</a>
+            <button id="logout-btn">Logout</button>
+        </nav>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="user-info">
+            <h1>Welcome back, <span id="username">Dr. Smith!</span> 👩‍⚕️</h1>
+            <p>Manage your consultations and client history.</p>
+        </section>
+
+        
+            
+            <div class="card full-width-card">
+                <h2>Recent Pet Check-up Submissions 📝</h2>
+                <div id="pet-checkup-history">
+                    <p id="no-pet-data">No new check-up forms submitted by pet owners yet.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Patient Records</h2>
+                <p>Access and update detailed medical records for your clients.</p>
+                <a href="#" class="button">View All Records</a>
+            </div>
+
+            <div class="card">
+                <h2>Manage Availability</h2>
+                <p>Update your schedule and block time for appointments.</p>
+                <a href="#" class="button">Set My Schedule</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Authorization Check ---
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const userType = localStorage.getItem('userType');
+            const userName = localStorage.getItem('userName') || 'Dr. Smith';
+
+            if (isLoggedIn !== 'true' || userType !== 'vet') {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // 1. Update Username
+            document.getElementById('username').textContent = userName;
+
+            // 2. Logout Logic
+            const logoutBtn = document.getElementById('logout-btn');
+            logoutBtn.addEventListener('click', () => {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            });
+            
+            // 3. Load and Display Pet Check-up Data
+            const pets = JSON.parse(localStorage.getItem('pets')) || [];
+            const historyContainer = document.getElementById('pet-checkup-history');
+            const noPetDataMessage = document.getElementById('no-pet-data');
+            
+            if (pets.length > 0) {
+                noPetDataMessage.style.display = 'none';
+                historyContainer.innerHTML = ''; // Clear the placeholder message
+                
+                pets.forEach(pet => {
+                    const item = document.createElement('div');
+                    item.className = 'pet-history-item';
+                    item.innerHTML = `
+                        <h4>${pet.name} (${pet.species}) - Checkup on ${pet.checkupDate}</h4>
+                        <p><strong>Breed:</strong> ${pet.breed} | <strong>Age:</strong> ${pet.age} years</p>
+                        <p><strong>Submitted by:</strong> Pet Owner (Email/ID N/A in this local view)</p>
+                        <div class="note">
+                            <strong>Owner Notes:</strong> ${pet.checkupNotes}
+                            <br>
+                            ${pet.vetName ? `(Reportedly seen by: ${pet.vetName})` : ''}
+                        </div>
+                    `;
+                    historyContainer.appendChild(item);
+                });
+            } else {
+                noPetDataMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
